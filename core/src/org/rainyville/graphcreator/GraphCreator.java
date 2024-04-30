@@ -77,10 +77,13 @@ public class GraphCreator extends ApplicationAdapter {
                         else {
                             int from = selectedIndex;
                             setSelectedNode(node);
-
-
                             int to = selectedIndex;
-                            matrix.addEdge(from, to);
+
+                            if (delete)
+                                matrix.removeEdge(from, to);
+                            else
+                                matrix.addEdge(from, to);
+
                             setSelectedNode(null);
                         }
                     } else if (mode == EditorMode.VERTEX && delete) {

@@ -76,6 +76,37 @@ public class AdjacencyMatrix {
         }
     }
 
+    public void removeEdge(int from, int to) {
+        int column = -1;
+
+        for (int e = 0; e < matrix[from].length; e++) {
+            if (matrix[from][e] == 1) {
+                for (int v = 0; v < matrix.length; v++) {
+                    if (matrix[v][e] == 1 && v == to) {
+                        column = e;
+                        break;
+                    }
+                }
+            }
+        }
+        // Couldn't find a column to delete
+        if (column == -1) return;
+
+        --edges;
+        int[][] old = matrix.clone();
+        matrix = new int[vertices][edges];
+        int a = 0, b = 0;
+        for (int v = 0; v < matrix.length; v++) {
+            for (int e = 0; e < matrix[v].length; e++) {
+                if (e == column) continue;
+
+                matrix[a][b++] = old[v][e];
+            }
+            ++a;
+            b = 0;
+        }
+    }
+
     public int[][] getMatrix() {
         return matrix;
     }
