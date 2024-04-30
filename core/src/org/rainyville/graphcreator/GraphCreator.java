@@ -53,7 +53,7 @@ public class GraphCreator extends ApplicationAdapter {
                 setSelectedNode(null);
                 if (keycode == Input.Keys.I) {
                     mode = mode.next();
-                } else if (keycode == Input.Keys.FORWARD_DEL) {
+                } else if (keycode == Input.Keys.FORWARD_DEL || keycode == Input.Keys.DEL) {
                     delete = !delete;
                 }
                 return true;
