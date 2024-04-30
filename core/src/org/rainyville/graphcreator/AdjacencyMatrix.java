@@ -96,11 +96,10 @@ public class AdjacencyMatrix {
         int[][] old = matrix.clone();
         matrix = new int[vertices][edges];
         int a = 0, b = 0;
-        for (int v = 0; v < matrix.length; v++) {
-            for (int e = 0; e < matrix[v].length; e++) {
+        for (int[] edges : old) {
+            for (int e = 0; e < edges.length; e++) {
                 if (e == column) continue;
-
-                matrix[a][b++] = old[v][e];
+                matrix[a][b++] = edges[e];
             }
             ++a;
             b = 0;
