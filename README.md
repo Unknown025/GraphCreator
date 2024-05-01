@@ -1,2 +1,14 @@
 # Graph Creator
-Allows for a visual representation of a graph, consisting of vertices and edges. 
+Allows for a visual representation of a graph, consisting of vertices and edges.
+
+| Functionality                                                                                                                                                                                                                                                     | Weight |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------|
+| 1. Graphical display of vertices and edges<br/>2. Input of vertices and edges<br/>3. Able to reposition vertices while maintaining adjacencies<br/>4. Deletion of vertices and edges<br/>5. Parallel edges<br/>6. Loops<br/>7. Ability to color or label vertices | 75     |
+| 8. Information about numbers of vertices and edges                                                                                                                                                                                                                | 2      |
+| 9. Information about degrees of vertices                                                                                                                                                                                                                          | 2      |
+| 10. Information about components                                                                                                                                                                                                                                  | 2      |
+| 11. Show which edges are bridges                                                                                                                                                                                                                                  | 2      |
+| 12. Show whether a graph is bipartite                                                                                                                                                                                                                             | 2      |
+| 13. Adjacency matrix                                                                                                                                                                                                                                              | 3      |
+| 14. Display of directed arcs.                                                                                                                                                                                                                                     | 2      |
+| Total                                                                                                                                                                                                                                                             | 90     |

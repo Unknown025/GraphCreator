@@ -14,11 +14,15 @@ public class AdjacencyMatrix {
     private int vertices;
     private int edges;
 
+    private boolean changed;
+
     public AdjacencyMatrix() {
         matrix = new int[vertices][edges];
     }
 
     public void addVertex() {
+        changed = true;
+
         ++vertices;
         int[][] old = matrix.clone();
         matrix = new int[vertices][edges];
@@ -28,6 +32,8 @@ public class AdjacencyMatrix {
     }
 
     public void removeVertex(int vertex) {
+        changed = true;
+
         HashSet<Integer> deleteList = new HashSet<>();
         for (int edge = 0; edge < matrix[vertex].length; edge++) {
             if (matrix[vertex][edge] == 1) {
@@ -55,17 +61,25 @@ public class AdjacencyMatrix {
     }
 
     public void addEdge(int from, int to) {
+        changed = true;
+
         ++edges;
         int[][] old = matrix.clone();
         matrix = new int[vertices][edges];
         for (int i = 0; i < old.length; i++) {
             System.arraycopy(old[i], 0, matrix[i], 0, old[i].length);
         }
-        matrix[from][edges - 1] = 1;
-        matrix[to][edges - 1] = 1;
+        if (from == to) {
+            matrix[from][edges - 1] = 2;
+        } else {
+            matrix[from][edges - 1] = 1;
+            matrix[to][edges - 1] = -1;
+        }
     }
 
     public void removeEdge(int edge) {
+        changed = true;
+
         --edges;
         int[][] old = matrix.clone();
         matrix = new int[vertices][edges];
@@ -77,12 +91,13 @@ public class AdjacencyMatrix {
     }
 
     public void removeEdge(int from, int to) {
+        changed = true;
         int column = -1;
 
         for (int e = 0; e < matrix[from].length; e++) {
-            if (matrix[from][e] == 1) {
+            if (matrix[from][e] != 0) {
                 for (int v = 0; v < matrix.length; v++) {
-                    if (matrix[v][e] == 1 && v == to) {
+                    if (matrix[v][e] != 0 && v == to) {
                         column = e;
                         break;
                     }
@@ -116,5 +131,16 @@ public class AdjacencyMatrix {
 
     public int getEdges() {
         return edges;
+    }
+
+    /**
+     * Checks if the graph has changed since the last time this function was called.
+     *
+     * @return Returns if the graph has changed.
+     */
+    public boolean hasChanged() {
+        boolean ret = changed;
+        changed = false;
+        return ret;
     }
 }

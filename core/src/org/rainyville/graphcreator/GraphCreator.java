@@ -14,9 +14,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class GraphCreator extends ApplicationAdapter {
     private OrthographicCamera camera;
@@ -31,8 +29,10 @@ public class GraphCreator extends ApplicationAdapter {
 
     private Node selectedNode;
     private int selectedIndex;
+    private int selectedDegree;
 
     private AdjacencyMatrix matrix;
+    private int components;
 
     @Override
     public void create() {
@@ -55,6 +55,8 @@ public class GraphCreator extends ApplicationAdapter {
                     mode = mode.next();
                 } else if (keycode == Input.Keys.FORWARD_DEL || keycode == Input.Keys.DEL) {
                     delete = !delete;
+                } else if (keycode == Input.Keys.R) {
+                    calculateComponents();
                 }
                 return true;
             }
@@ -153,6 +155,8 @@ public class GraphCreator extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
 
+        if (matrix.hasChanged()) calculateComponents();
+
         for (int i = 0; i < nodeList.size(); i++) {
             Node node = nodeList.get(i);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -167,11 +171,11 @@ public class GraphCreator extends ApplicationAdapter {
             builder.append("v").append(i).append(": ");
             for (int edge = 0; edge < array[i].length; edge++) {
                 connected.clear();
-                if (array[i][edge] == 1) {
+                if (array[i][edge] != 0) {
                     builder.append('e').append(edge).append(',');
 
                     for (int vertex = 0; vertex < array.length; vertex++) {
-                        if (array[vertex][edge] == 1) {
+                        if (array[vertex][edge] != 0) {
                             connected.add(vertex);
                         }
                     }
@@ -200,13 +204,13 @@ public class GraphCreator extends ApplicationAdapter {
 
         batch.begin();
 
-        font.draw(batch, String.format("Vertices: %d, edges: %d", matrix.getVertices(), matrix.getEdges()), 2, Gdx.graphics.getHeight() - 20);
+        font.draw(batch, String.format("Vertices: %d, edges: %d, components: %d", matrix.getVertices(), matrix.getEdges(), components), 2, Gdx.graphics.getHeight() - 20);
         String text = String.format("FPS: %d", Gdx.graphics.getFramesPerSecond());
 
         layout.setText(font, text);
         font.draw(batch, text, Gdx.graphics.getWidth() - layout.width, Gdx.graphics.getHeight());
         if (selectedNode != null)
-            font.draw(batch, String.format("Selected Node: v%d", selectedIndex), 2, Gdx.graphics.getHeight() - 40);
+            font.draw(batch, String.format("Selected Node: v%d (degree: %d)", selectedIndex, selectedDegree), 2, Gdx.graphics.getHeight() - 40);
         batch.end();
 
         batch.begin();
@@ -218,6 +222,35 @@ public class GraphCreator extends ApplicationAdapter {
     public void dispose() {
         shapeRenderer.dispose();
         batch.dispose();
+    }
+
+    private void calculateComponents() {
+        components = 0;
+
+        Queue<Integer> pending = new LinkedList<>();
+        HashSet<Integer> traversed = new HashSet<>();
+        int[][] array = matrix.getMatrix();
+
+        for (int i = 0; i < nodeList.size(); i++) {
+            pending.add(i);
+        }
+
+        while (!pending.isEmpty()) {
+            int nodeID = pending.poll();
+            // If the node ID has not been traversed yet, increase component count
+            if (traversed.add(nodeID))
+                ++components;
+
+            for (int edge = 0; edge < array[nodeID].length; edge++) {
+                if (array[nodeID][edge] != 0) {
+                    for (int vertex = 0; vertex < array.length; vertex++) {
+                        if (array[vertex][edge] != 0) {
+                            traversed.add(vertex);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private Node matchNode() {
@@ -241,6 +274,8 @@ public class GraphCreator extends ApplicationAdapter {
     private void setSelectedNode(Node selected) {
         this.selectedNode = selected;
         this.selectedIndex = -1;
+        this.selectedDegree = 0;
+
         if (selectedNode == null) return;
 
         for (int i = 0; i < nodeList.size(); i++) {
@@ -248,6 +283,19 @@ public class GraphCreator extends ApplicationAdapter {
             if (node.equals(selectedNode)) {
                 selectedIndex = i;
                 break;
+            }
+        }
+
+        if (this.selectedIndex == -1) return;
+
+        int[][] array = matrix.getMatrix();
+        for (int edge = 0; edge < array[selectedIndex].length; edge++) {
+            if (array[selectedIndex][edge] != 0) {
+                for (int vertex = 0; vertex < array.length; vertex++) {
+                    if (array[vertex][edge] != 0 && vertex != selectedIndex || array[vertex][edge] == 2) {
+                        ++selectedDegree;
+                    }
+                }
             }
         }
     }
